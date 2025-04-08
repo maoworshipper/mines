@@ -12,7 +12,10 @@ main {
   row-gap: 32px;
 }
 
-h1, h2, h3, h4 {
+h1,
+h2,
+h3,
+h4 {
   margin: 0;
 }
 
@@ -24,4 +27,11 @@ input {
 
 .disabled {
   pointer-events: none;
+}
+
+.optionButton {
+  width: 50px;
+  height: 50px;
+  border-radius: 0;
+  border: 1px solid #222;
 }
