@@ -16,6 +16,40 @@ function App() {
 
   const handleGameSize = (value) => setGameSize(value);
 
+  const generateArray = (totalItems) => {
+    let newArray = Array();
+    let grandTotal = 0;
+
+    for (let i = 0; i < totalItems; i++) {
+      newArray.push(i);
+    }
+
+    const arrayValues = newArray.map(() => {
+      return newArray.map(() => {
+        const itemValue = Math.round(Math.random() * gameSize);
+        grandTotal += itemValue;
+        return itemValue;
+      });
+    });
+
+    const itemsActive = newArray.map(() => {
+      return newArray.map(() => false);
+    });
+
+    setIndexArray(newArray);
+    setTotal(grandTotal);
+
+    setValuesArray({
+      ...valuesArray,
+      ...arrayValues,
+    });
+
+    setActiveArray({
+      ...activeArray,
+      ...itemsActive,
+    });
+  };
+
   const handleClick = (itemValue, itemRow, itemColumn) => {
     setActiveArray({
       ...activeArray,
@@ -32,40 +66,18 @@ function App() {
     SetAcum((prev) => prev + itemValue);
   };
 
-  const generateArray = (totalItems) => {
-    let newArray = Array();
-    let grandTotal = 0;
-
-    for (let i = 0; i < totalItems; i++) {
-      newArray.push(i);
-    }
-
-    setIndexArray(newArray);
-
-    const arrayValues = newArray.map(() => {
-      return newArray.map(() => {
-        const itemValue = Math.round(Math.random() * gameSize);
-        grandTotal += itemValue;
-        return itemValue;
-      });
+  const generateColumns = (itemRow) =>
+    indexArray.map((itemColumn) => {
+      return (
+        <OptionButton
+          key={`item-${itemRow}-${itemColumn}`}
+          value={valuesArray[itemRow][itemColumn]}
+          showValue={activeArray[itemRow][itemColumn]}
+          handleClick={(value) => handleClick(value, itemRow, itemColumn)}
+          disabled={activeArray[itemRow][itemColumn]}
+        />
+      );
     });
-
-    setTotal(grandTotal);
-
-    const itemsActive = newArray.map(() => {
-      return newArray.map(() => false);
-    });
-
-    setValuesArray({
-      ...valuesArray,
-      ...arrayValues,
-    });
-
-    setActiveArray({
-      ...activeArray,
-      ...itemsActive,
-    });
-  };
 
   const restartGame = () => {
     setGameSize(0);
@@ -105,25 +117,14 @@ function App() {
         onChange={(e) => handleGameSize(e.target.value)}
         ref={inputRef}
       />
-      <div className={showResult ? "disabled" : ""}>
-        {gameSize > 0 &&
-          indexArray.map((itemRow) => {
-            const NewColumn = indexArray.map((itemColumn) => {
-              return (
-                <OptionButton
-                  key={`item-${itemRow}-${itemColumn}`}
-                  value={valuesArray[itemRow][itemColumn]}
-                  showValue={activeArray[itemRow][itemColumn]}
-                  handleClick={(value) =>
-                    handleClick(value, itemRow, itemColumn)
-                  }
-                  disabled={activeArray[itemRow][itemColumn]}
-                />
-              );
-            });
-            return <Row key={`row-${itemRow}`}>{NewColumn}</Row>;
+      {gameSize > 0 && (
+        <div className={showResult ? "disabled" : ""}>
+          {indexArray.map((itemRow) => {
+            return <Row key={`row-${itemRow}`}>{generateColumns(itemRow)}</Row>;
           })}
-      </div>
+        </div>
+      )}
+
       <h4>{acum > 0 ? `Acumulado: ${acum}` : ""}</h4>
       {showResult && <button onClick={restartGame}>{result}</button>}
     </main>
